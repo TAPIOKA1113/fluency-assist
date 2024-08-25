@@ -1,10 +1,30 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Editor } from "react-draft-wysiwyg";
-import { EditorState } from "draft-js";
+import { EditorState, convertToRaw } from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import axios from 'axios';
 
 const TextEditor = () => {
     const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+
+    useEffect(() => {
+        const sendContent = async () => {
+            const rawContentState = convertToRaw(editorState.getCurrentContent());
+            const content = rawContentState.blocks.map(block => block.text).join('\n');
+            try {
+                await axios.post('http://localhost:8000/update_text', { content });
+            } catch (error) {
+                console.error('エラー:', error);
+            }
+        };
+
+        const debounce = setTimeout(() => {
+            sendContent();
+        }, 500);
+
+        return () => clearTimeout(debounce);
+    }, [editorState]);
+
     return <div>
         <Editor
             editorState={editorState}
