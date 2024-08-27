@@ -10,9 +10,9 @@ const TextEditor = () => {
     useEffect(() => {
         const sendContent = async () => {
             const rawContentState = convertToRaw(editorState.getCurrentContent());
-            const content = rawContentState.blocks.map(block => block.text).join('\n');
+            const text = rawContentState.blocks.map(block => block.text).join('\n');
             try {
-                await axios.post('http://localhost:8000/update_text', { content });
+                await axios.post('http://localhost:8000/update', { text});
             } catch (error) {
                 console.error('エラー:', error);
             }
